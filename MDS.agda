@@ -67,7 +67,7 @@ prepend : List Elem → List (List Elem) → List (List Elem)
 prepend x [] = [ x ]
 prepend x (y ∷ xs) with x ≤d? y
 ... | yes _ = prepend (x ++ y) xs
-... | no _ = x ∷ y ∷ xs
+... | no _ = x ∷ (y ∷ xs)
 
 addl : Elem → List (List Elem) → List (List Elem)
 addl a xs = prepend [ a ] xs

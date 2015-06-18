@@ -131,18 +131,23 @@ bitonic-left z .(xs ++ [ y ]) x (∷ʳ-wf xs sn y) dec nex nx nz zxsy<x
     adj-init rewrite sym (map⁺-++⁺ (_++_ z ∘ concat) (prefixes xs) [ xs ++ [ y ] ]⁺ ) 
                    | sym (prefixes-∷ʳ xs y) = 
            bitonic-left z xs y sn (Adj-init dec) 
-             (All-init nex) (All-last xs nex) nz zxs<y
-       where zxs<y : (z ++ concat xs) <d y 
-             zxs<y with zxsy<x 
-             ... | zxsy<x' rewrite concat-snoc xs y 
-                                 | assoc z (concat xs) y = 
-              (⇒-begin 
-                (z ++ concat xs) ++ y <d x 
-               ⇒⟨ (λ m → <d-trans m (Adj-last xs dec)) ⟩ 
-                (z ++ concat xs) ++ y <d y 
-               ⇒⟨ ++-<d→<d (NE-++-l nz) (All-last xs nex) ⟩ 
-                z ++ concat xs <d y ⇒∎) 
-              zxsy<x'
+             (All-init nex) (All-last xs nex) nz (zxs<y z xs y zxsy<x dec nex nz) -- zxs<y
+       where zxs<y : ∀ z xs y
+                     → (z ++ foldr _++_ [] (xs ++ y ∷ [])) <d x
+                     → Adj (λ x₁ y₁ → y₁ <d x₁) ((xs ++ y ∷ []) ++ x ∷ [])
+                     → All NonEmpty (xs ++ y ∷ [])
+                     → NonEmpty z
+                     → (z ++ concat xs) <d y
+             zxs<y z xs y zxsy<x' dec nex nz
+               rewrite concat-snoc xs y
+                     | assoc z (concat xs) y  =
+                (⇒-begin
+                   (z ++ concat xs) ++ y <d x
+                 ⇒⟨ (λ m → <d-trans m (Adj-last xs dec)) ⟩
+                   (z ++ concat xs) ++ y <d y
+                 ⇒⟨ ++-<d→<d (NE-++-l nz) (All-last xs nex) ⟩
+                   (z ++ concat xs <d y ⇒∎))
+                  zxsy<x'
 
 {- Maybe necessary for another choice of ↑d 
 
@@ -310,7 +315,7 @@ prepend-DRSP {x} {y ∷ xs} NEx RSx _ with x ≤d? y
 prepend-DRSP {x} {y ∷ xs} NEx RSx (Dxs , NExs , RSxs) | no x>dy = x>dy ∷ Dxs , NEx ∷ NExs , RSx ∷ RSxs
 prepend-DRSP {x} {y ∷ .[]} NEx RSx ([·] , NEy ∷ NExs , RSy ∷ RSxs) | yes x≤dy = 
    [·] , NE-++-l NEx ∷ [] , RightSkew-++ NEx NEy RSx RSy x≤dy ∷ []
-prepend-DRSP {x} {y ∷ z ∷ xs} NEx RSx (y>dz ∷ Dzxs , NEy ∷ NExs , RSy ∷ RSxs) | yes x≤dy 
+prepend-DRSP {x} {y ∷ (z ∷ xs)} NEx RSx (y>dz ∷ Dzxs , NEy ∷ NExs , RSy ∷ RSxs) | yes x≤dy 
   = prepend-DRSP {x ++ y} {z ∷ xs} (NE-++-l NEx) (RightSkew-++ NEx NEy RSx RSy x≤dy) (Dzxs , NExs , RSxs)
 
 addl-DRSP : ∀ a {xs} → DRSP xs → DRSP (addl a xs)

@@ -215,30 +215,36 @@ private
   pre-pre ch z (b ∷ y) (a ∷ x) (zby⊑z , _) | inj₁ (eq , _)
     rewrite eq = ⊥-elim (¬++-⊑ z b y zby⊑z)
   pre-pre ch z [] (a ∷ x) y∈ | inj₂ (eq , _) rewrite eq | r-id-++-[] z = here refl
-  pre-pre {_} {↑} ch z (b ∷ y) (a ∷ x) y∈ | inj₂ (eq , _) 
-    rewrite eq = there mem
-   where mx⊑zaw : ∃ (λ w → (max-with ↑ (map⁺ (λ x' → z ++ a ∷ x') (prefixes x))) 
+  pre-pre {A} {↑} ch z (b ∷ y) (a ∷ x) y∈ | inj₂ (eq , _) 
+    rewrite eq = there (mem z {b} {y} a x y∈) 
+   where mx⊑zaw : ∀ z a x
+                → ∃ (λ w → (max-with ↑ (map⁺ (λ x' → z ++ a ∷ x') (prefixes x))) 
                           ≡ (z ++ a ∷ w))
-         mx⊑zaw = max-pred (Choose-Left⇒Choose ch) 
-                   P (map⁺ (λ w → z ++ a ∷ w) (prefixes x)) 
-                   (map⁺-pred (λ w → z ++ a ∷ w) P (λ w → w , refl) (prefixes x))
+         mx⊑zaw z a x = max-pred (Choose-Left⇒Choose ch) 
+                         P (map⁺ (λ w → z ++ a ∷ w) (prefixes x)) 
+                          (map⁺-pred (λ w → z ++ a ∷ w) P (λ w → w , refl) (prefixes x))
            where P : List _ → Set
                  P x = ∃ (λ w → x ≡ z ++ a ∷ w)
 
-         prefix-eq : ∀ z {b y a w} → z ++ b ∷ y ⊑ z ++ a ∷ w → b ≡ a
+         prefix-eq : ∀ z {b y} {a : A} {w} → z ++ b ∷ y ⊑ z ++ a ∷ w → b ≡ a
          prefix-eq [] (a ∷ _) = refl
          prefix-eq (_ ∷ z) (._ ∷ pre) = prefix-eq z pre
 
-         b≡a : b ≡ a
-         b≡a with y∈ | mx⊑zaw 
+         b≡a : ∀ z {b y} a x
+             → (z ++ b ∷ y ⊏ max-with ↑ (map⁺ (λ w → z ++ a ∷ w) (prefixes x)))
+             → b ≡ a
+         b≡a z a x y∈ with y∈ | mx⊑zaw z a x
          ... | (zby⊑ , _) | (_ , eq) rewrite eq = prefix-eq z zby⊑
 
-         mem : z ++ b ∷ y ∈⁻ max-with-left ch (map⁺ (λ w → z ++ a ∷ w) (prefixes x))
-         mem with y∈
-         mem | y∈ rewrite b≡a | assoc z [ a ] y 
-                        | map⁺-cong (λ w → z ++ a ∷ w) (λ w → (z ++ [ a ]) ++ w) 
-                           (λ w → assoc z [ a ] w) (prefixes x) 
-           = pre-pre ch (z ++ [ a ]) y x y∈
+         mem : ∀ z {b y} (a : A) (x : List A)
+             → (z ++ b ∷ y ⊏ max-with ↑ (map⁺ (λ w → z ++ a ∷ w) (prefixes x)))
+             → z ++ b ∷ y ∈⁻ max-with-left ch (map⁺ (λ w → z ++ a ∷ w) (prefixes x))
+         mem z {b} {y} a x y∈ with y∈
+         ... | y∈' rewrite b≡a z {b} {y} a x y∈
+                         | assoc z [ a ] y
+                         | map⁺-cong (λ w → z ++ a ∷ w) (λ w → (z ++ [ a ]) ++ w) 
+                           (λ w → assoc z [ a ] w) (prefixes x)
+           = pre-pre ch (z ++ [ a ]) y x y∈'
 
 pre-prefix : ∀ {A} {↑ : List A → List A → List A} {≼ : List A → List A → Set}
              → (choose : Choose-Left ↑ ≼)

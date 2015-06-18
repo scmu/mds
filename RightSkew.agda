@@ -124,6 +124,8 @@ prune-either {z} {x₁} {x₂} nz nx₁ nx₂ x₁≤x₂ with x₁ ≤d? z
                  z ++ x₁ <d z ++ x₁ ++ x₂ 
                ⇒∎
 {-
+-- Another version, for another choice of tie-breaking.
+
 prune-either : ∀ {z x₁ x₂} → NonEmpty z → NonEmpty x₁ → NonEmpty x₂
                → x₁ ≤d x₂
                → (z ++ x₁ <d z) ⊎ (z ++ x₁ ≤d z ++ x₁ ++ x₂)
@@ -224,13 +226,14 @@ rightskew-prefix-cancel z y (a ∷ x) nz ny rx = body
                    (map⁺-pred (_++_ (z ++ y ++ a ∷ [])) NonEmpty ne (prefixes x))
             where ne : ∀ x → NonEmpty ((z ++ y ++ a ∷ []) ++ x)
                   ne x = NE-++-l (NE-++-l nz) -}
-         y≤ax : y ≤d (a ∷ x)
-         y≤ax with rx | ny 
-         y≤ax | rx | ny with y
-         y≤ax | rx | () | []
-         y≤ax | rx | ny | b ∷ y' = by≤ax
-           where by≤ax :  b ∷ y' ≤d a ∷ x
-                 by≤ax with rx 0 (b ∷ _) (s≤s z≤n) 
+         y≤ax : ∀ y a x
+                → RightSkewExt y (a ∷ x)
+                → NonEmpty y → y ≤d (a ∷ x)
+         y≤ax y a x rx ny with y
+         y≤ax y a x rx () | []
+         y≤ax y a x rx ny | (b ∷ y') = by≤ax b y' a x rx
+           where by≤ax : ∀ b y' a x → RightSkewExt (b ∷ y') (a ∷ x) → b ∷ y' ≤d a ∷ x
+                 by≤ax b y' a x rx with rx 0 (b ∷ _) (s≤s z≤n)
                  ... | p rewrite r-id-++-[] y' = p
 
          zyax∈ : (z ++ y ++ a ∷ x) ∈ map⁺ (_++_ (z ++ y ++ a ∷ [])) (prefixes x)
@@ -246,7 +249,7 @@ rightskew-prefix-cancel z y (a ∷ x) nz ny rx = body
                          ≡ z ↑d (z ++ y ++ a ∷ x) 
          two-in-three' with y≤ax
          ... | y≤ax rewrite sym (↑d-assoc z (z ++ y) (z ++ y ++ a ∷ x)) = 
-           two-in-three nz ny (a ∷ x) y≤ax
+           two-in-three nz ny (a ∷ x) (y≤ax y a x rx ny)
 
          rs-ext : RightSkewExt (y ++ [ a ]) x
          rs-ext n ne rb rewrite sym (assoc y [ a ] (take n x)) =
@@ -304,7 +307,7 @@ rightskew-discrete z (x ∷ xs) nz (rx ∷ rs) =
   ≡⟨ cong (λ w → z ↑d ((z ++ x) ↑d maxd w)) eq₁ ⟩ 
     z ↑d ((z ++ x) ↑d
                maxd (map⁺ (_++_ z ∘ concat) (map⁺ (_∷_ x) (prefixes xs))))
-  ≡⟨ sym eq₂ ⟩
+  ≡⟨ sym (eq₂ z x xs) ⟩
     maxd (map⁺ (_++_ z ∘ concat) (prefixes (x ∷ xs))) 
   ≡∎
  where eq₁ : map⁺ (_++_ (z ++ x) ∘ concat) (prefixes xs)
@@ -318,16 +321,17 @@ rightskew-discrete z (x ∷ xs) nz (rx ∷ rs) =
             (λ xs' → assoc z x (concat xs')) (prefixes xs) ⟩ 
            map⁺ (_++_ (z ++ x) ∘ concat) (prefixes xs) 
          ≡∎)
-       eq₂ : maxd (map⁺ (_++_ z ∘ concat) (prefixes (x ∷ xs))) 
+       eq₂ : ∀ z x xs
+           → maxd (map⁺ (_++_ z ∘ concat) (prefixes (x ∷ xs))) 
              ≡ z ↑d ((z ++ x) ↑d
                maxd (map⁺ (_++_ z ∘ concat) (map⁺ (_∷_ x) (prefixes xs))))
-       eq₂ rewrite r-id-++-[] z with xs
+       eq₂ z x xs rewrite r-id-++-[] z with xs
        ... | [] rewrite (r-id-++-[] x) | ↑d-idem (z ++ x) = refl
-       ... | y ∷ xs rewrite (r-id-++-[] x) 
-                    | ↑d-assoc (z ++ x) (z ++ x)
+       ... | y ∷ xs' rewrite (r-id-++-[] x) 
+                     | ↑d-assoc (z ++ x) (z ++ x)
                          (maxd (map⁺ (_++_ z ∘ concat) 
-                                 (map⁺ (_∷_ x) (map⁺ (_∷_ y) (prefixes xs)))))
-                    | ↑d-idem (z ++ x)
+                                 (map⁺ (_∷_ x) (map⁺ (_∷_ y) (prefixes xs')))))
+                     | ↑d-idem (z ++ x)
                = refl
 
 rightskew-discrete' :
