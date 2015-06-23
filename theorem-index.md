@@ -37,3 +37,5 @@
 * Lemma 4.14: `DRSP`: `bitonic-left`.
 * Theorem 4.15: `DRSP`: `maxchop-correct`.
 * Corollary 4.16: `DRSP`: `maxchop-correct'`.
+* (27): `MDS-Derive`: `fusion`.
+* Section 5.2: `MDS-Derive`: `mwp-defn`.

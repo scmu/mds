@@ -83,6 +83,9 @@ postulate
 
 postulate 
   hsplit-NE : ∀ a x → NonEmpty (proj₁ (hsplit (a ∷ x)))
+
+  hsplit-nil : hsplit [] ≡ ([] , [])
+  
   hsplit-cons : ∀ a x → hsplit (a ∷ x) ≡
                         let zx₂ = hsplit x
                             z = proj₁ zx₂
@@ -189,6 +192,8 @@ fusion a x rewrite hsplit-mdp (a ∷ x) | hsplit-cons a x
     in (z , maxchop z xs)
 -}
 
+-- Derivation 1. A scan version of the algorithm.
+
 main : mds ≗ max≼ ∘ map⁺ wflatten ∘ scanr⁺ (λ a → wmaxchop ∘ wcons a) (wbuild [])
 main =
   ≐-begin 
@@ -215,3 +220,49 @@ main =
    worker-wrapper-intro x 
      rewrite map⁺-functor wflatten wbuild x
            | map⁺-id (wflatten ∘ wbuild) w-flatten-build x = refl
+
+-- Derivation 2. An inductive version.
+
+mwp : List Elem → (List Elem × Window)
+mwp [] = ([] , ([] , []))
+mwp (a ∷ x) with mwp x
+... | (m , w) = let u = wmaxchop (wcons a w)
+                in (wflatten u ↑≼ m , u)
+
+mwp-defn : ∀ x → mwp x ≡ (ms x , wbuild (wp x))
+mwp-defn [] rewrite hsplit-nil = refl
+mwp-defn (a ∷ x) with mwp-defn x 
+... | eq with mwp x
+...      | (m , w) = sym ( 
+  ≡-begin
+    (ms (a ∷ x) , wbuild (wp (a ∷ x)))
+  ≡⟨ refl ⟩
+    (mdp (a ∷ wp x) ↑≼ ms x , wbuild (mdp (a ∷ wp x)))
+  ≡⟨ cong (λ y → y ↑≼ ms x , wbuild (mdp (a ∷ wp x)))
+       (sym (w-flatten-build _)) ⟩
+    (wflatten (wbuild (mdp (a ∷ wp x))) ↑≼ ms x , wbuild (mdp (a ∷ wp x))) 
+  ≡⟨ refl ⟩ 
+    let u = wbuild (mdp (a ∷ wp x))
+    in (wflatten u ↑≼ ms x , u)
+  ≡⟨ cong (λ u → wflatten u ↑≼ ms x , u) (fusion a (wp x)) ⟩ 
+    let u = wmaxchop (wcons a (wbuild (wp x)))
+    in (wflatten u ↑≼ ms x , u)
+  ≡⟨ cong (λ m₁ → let u₁ = wmaxchop (wcons a (wbuild (wp x)))
+                  in wflatten u₁ ↑≼ m₁ , u₁)
+       (sym (≡-proj₁ eq)) ⟩
+    let u = wmaxchop (wcons a (wbuild (wp x)))
+    in (wflatten u ↑≼ m , u)  
+  ≡⟨ cong (λ w₁ → let u₁ = wmaxchop (wcons a w₁)
+                  in wflatten u₁ ↑≼ m , u₁)
+       (sym (≡-proj₂ eq)) ⟩  
+    let u = wmaxchop (wcons a w)
+    in (wflatten u ↑≼ m , u)
+  ≡∎ )
+ where
+  private
+     ≡-proj₁ : {A B : Set} {a₁ : A} {b₁ : B} {a₂ : A} {b₂ : B}
+             → (a₁ , b₁) ≡ (a₂ , b₂) → a₁ ≡ a₂
+     ≡-proj₁ refl = refl        
+     ≡-proj₂ : {A B : Set} {a₁ : A} {b₁ : B} {a₂ : A} {b₂ : B}
+             → (a₁ , b₁) ≡ (a₂ , b₂) → b₁ ≡ b₂
+     ≡-proj₂ refl = refl  
