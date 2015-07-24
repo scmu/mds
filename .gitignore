@@ -1,1 +1,5 @@
 *.agdai
+*.hi
+*.o
+mds
+prog_new_productive/testdata
