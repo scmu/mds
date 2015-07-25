@@ -1,6 +1,7 @@
-module TestGen where
+module Main where
 
 import System.Environment
+import Control.Monad
 import Control.Monad.Random
 
 genElem :: MonadRandom m =>
@@ -20,11 +21,13 @@ genElems (vMin, vMax) (wMin, wMax) n =
 
 
 main :: IO ()
-main = do (vMin' : vMax' : wMin' : wMax' : n' : _) <- getArgs
+main = do (vMin' : vMax' : wMin' : wMax' : n' : m' : _) <- getArgs
           let vMin = read vMin'
           let vMax = read vMax'
           let wMin = read wMin'
           let wMax = read wMax'
           let n    = read n'
-          es <- evalRandIO (genElems (vMin, vMax) (wMin, wMax) n)
-          print es
+          let m    = read m'
+          replicateM_ m
+            (do es <- evalRandIO (genElems (vMin, vMax) (wMin, wMax) n)
+                print es)
