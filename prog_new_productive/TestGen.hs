@@ -21,6 +21,19 @@ genElems (vMin, vMax) vShift (wMin, wMax) n =
      es <- genElems (vMin, vMax) vShift (wMin, wMax) (n-1)
      return (e : es)
 
+{-
+Arguments:
+  vMin : minimum weight
+  vMax : maximum weight
+  vShift : 'shifting' the weight, such that the distribution is not
+           uniform. Set it to 0 for uniform distribution.
+           e.g. vMin = -200, vMax = 200, vShift = 100
+           generates weights between -100 and 200, with 100 "folded back".
+  wMin : minimum width
+  wMax : maximum width
+  n    : number of elements in a list
+  m    : number of lists
+-}
 
 main :: IO ()
 main = do (vMin' : vMax' : vShift' : wMin' : wMax' : n' : m' : _) <- getArgs
