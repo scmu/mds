@@ -13,18 +13,17 @@
 * Lemma 3.3 (Sandwich Lemma)
   * (16) `Properties`: `sandwich`.
 * Inductive definition of `mds`: `MDS`: `mds`.
-* Lemma 3.4 (Overlap Lemma)
-  * (17) `Overlap`: `overlap≼`.
-* (18) `MDS`: `wp`.
-* (19) `MDS`: `ms`.
-* (20) `Properties.MDPMono`: `wp⊑id`.
-* Lemma 3.5
-  * (21) `Properties.Impervity`: `impervity-id≡wp`, `impervity-id≡mds`.
-  * (22) `Properties.Bipartite`: `bipartite-id→wp`, `bipartite-id→mds`.
-* Section 3.4 `mds x = ms x`.
-  * `Proof-Outer`: `main`.
+* Lemma 3.5 (Overlap Lemma): `Overlap`: `overlap≼`.
+* (17) `MDS`: `wp`.
+* (18) `MDS`: `ms`.
+* (19) `Properties.MDPMono`: `wp⊑id`.
 * Lemma 3.6
-  * (25) `Proof-Outer`: `gen`.
+  * (20) `Properties.Impervity`: `impervity-id≡wp`, `impervity-id≡mds`.
+  * (21) `Properties.Bipartite`: `bipartite-id→wp`, `bipartite-id→mds`.
+  * Section 3.6 `mds x = ms x`.
+    * `Proof-Outer`: `main`.
+  * Lemma 3.7
+    * (24) `Proof-Outer`: `gen`.
 * Definition 4.1: `RightSkew`: `RightSkew`.
 * Lemma 4.3: `RightSkew`: `RightSkew-++`.
 * Lemma 4.4: `RightSkew`: `two-in-three`.
@@ -37,5 +36,5 @@
 * Lemma 4.14: `DRSP`: `bitonic-left`.
 * Theorem 4.15: `DRSP`: `maxchop-correct`.
 * Corollary 4.16: `DRSP`: `maxchop-correct'`.
-* (27): `MDS-Derive`: `fusion`.
-* Section 5.2: `MDS-Derive`: `mwp-defn`.
+* (26): `MDS-Derive`: `fusion`.
+* Section 5.1: `MDS-Derive`: `mwp-defn`.
