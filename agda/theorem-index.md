@@ -10,7 +10,8 @@
 * Lemma 3.2 (Monotonicity of `mdp`)
   * (14) `Properties.MDPMono`: `mdp-⊑-mono`.
   * (15) `Properties.MDPMono`: `mdp-⊑-≼-mono`.
-* Lemma 3.3 (Sandwich Lemma)
+* Lemma 3.3: `Properties.Max`: `prefix-≺`.
+* Lemma 3.4 (Sandwich Lemma)
   * (16) `Properties`: `sandwich`.
 * Inductive definition of `mds`: `MDS`: `mds`.
 * Lemma 3.5 (Overlap Lemma): `Overlap`: `overlap≼`.
